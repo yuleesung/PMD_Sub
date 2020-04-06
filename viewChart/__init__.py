@@ -7,7 +7,7 @@ from urllib.request import urlopen
 import xml.etree.ElementTree as ET
 import pandas as pd
 from pandas import Series, DataFrame
-
+import datetime
 
 
 #크로스 도메인 오류를 해결하기 위해 
@@ -29,6 +29,23 @@ def mapChart():
     11' : 서울, '26' : 부산, '27' : 대구, '28' : 인천 '29' : 광주, '30' : 대전, '31' : 울산, '36' : 세종, 
     41' : 경기, '42' : 강원, '43' : 충북, '44' : 충남, '45' : 전북, '46' : 전남, '47' : 경북, '48' : 경남, '50' : 제주
     '''
+    now = datetime.datetime.now()
+    a = now + datetime.timedelta(days=365)
+
+    now1 = str(now)[0:10]
+    after1 = str(a)[0:10]
+    now2 = now1.split('-')
+    after2 = after1.split('-')
+    
+    now3 = ''
+    after3 = ''
+    
+    for i in now2:
+        now3 += i
+        
+    for i in after2:
+        after3 += i
+    
     
     # 지역 값을 list에 저장
     loc = ['11','26','27','28','29','30','31','36','41','42','43','44','45','46','47','48','50']
@@ -38,45 +55,62 @@ def mapChart():
     
     for url in loc:
         # 지역별 url 생성
-        spec = "http://hrd.go.kr/jsp/HRDP/HRDPO00/HRDPOA60/HRDPOA60_1.jsp?returnType=XML&authKey=Aflc7YIke55KR8qliEbmLwJGWIpsH2DL&pageNum=1&pageSize=100&srchTraStDt=20200401&srchTraEndDt=20200701&outType=1&sort=ASC&sortCol=TR_STT_DT&srchTraArea1="+url
+        spec = "http://hrd.go.kr/jsp/HRDP/HRDPO00/HRDPOA60/HRDPOA60_1.jsp?returnType=XML&authKey=Aflc7YIke55KR8qliEbmLwJGWIpsH2DL&pageNum=1&pageSize=100&srchTraStDt="+now3+"&srchTraEndDt="+after3+"&outType=1&sort=ASC&sortCol=TR_STT_DT&srchTraArea1="+url
         
         # row에 담을 지역 값
         city = '' 
-        
+        name = ''
         if(url == '11'):
             city = "KR-11" # 차트 지역코드
+            name = "서울"
         if(url == '26'):
             city = "KR-26"
+            name = "부산"
         if(url == '27'):
             city = "KR-27"
+            name = "대구"
         if(url == '28'):
             city = "KR-28"
+            name = "인천"
         if(url == '29'):
             city = "KR-29"
+            name = "광주"
         if(url == '30'):
             city = "KR-30"
+            name = "대전"
         if(url == '31'):
             city = "KR-31"
+            name = "울산"
         if(url == '36'):
             city = "KR-50"
+            name = "세종"
         if(url == '41'):
             city = "KR-41"
+            name = "경기"
         if(url == '42'):
             city = "KR-42"
+            name = "강원"
         if(url == '43'):
             city = "KR-43"
+            name = "충북"
         if(url == '44'):
             city = "KR-44"
+            name = "충남"
         if(url == '45'):
             city = "KR-45"
+            name = "전북"
         if(url == '46'):
             city = "KR-46"
+            name = "전남"
         if(url == '47'):
             city = "KR-47"
+            name = "경북"
         if(url == '48'):
             city = "KR-48"
+            name = "경남"
         if(url == '50'):
             city = "KR-49"
+            name = "제주"
 
 
         res = urlopen(spec).read().decode('euc-kr')  # 파일 읽기전용   #.decode('euc-kr')
@@ -84,7 +118,7 @@ def mapChart():
     
         cnt = xmlDoc.find('scn_cnt').text # 지역별 훈련과정 갯수
         
-        row.append({'value':cnt,'id':city}) # 지역, 갯수를 row에 추가
+        row.append({'value':cnt,'id':city, 'name':name}) # 지역, 갯수를 row에 추가
     
     df = DataFrame(row) 
     
@@ -99,6 +133,25 @@ def mapChart():
 @app.route("/stackChart", methods=['POST']) #post방식
 #@app.route("/stackChart") #get방식
 def stackChart():
+    
+    now = datetime.datetime.now()
+    a = now + datetime.timedelta(days=365)
+    
+    now1 = str(now)[0:10]
+    after1 = str(a)[0:10]
+    now2 = now1.split('-')
+    after2 = after1.split('-')
+    
+    now3 = ''
+    after3 = ''
+    
+    for i in now2:
+        now3 += i
+        
+    for i in after2:
+        after3 += i
+    
+    
     # 결과값을 담을 공간
     row_stack = []
     
@@ -109,7 +162,7 @@ def stackChart():
     
     cod_val = name #spec에 넣을 코드값
     
-    spec = "http://hrd.go.kr/jsp/HRDP/HRDPO00/HRDPOA60/HRDPOA60_1.jsp?returnType=XML&authKey=Aflc7YIke55KR8qliEbmLwJGWIpsH2DL&pageNum=1&pageSize=100&srchTraStDt=20200402&srchTraEndDt=20200702&outType=1&sort=ASC&sortCol=TR_STT_DT&srchKeco1="+cod_val
+    spec = "http://hrd.go.kr/jsp/HRDP/HRDPO00/HRDPOA60/HRDPOA60_1.jsp?returnType=XML&authKey=Aflc7YIke55KR8qliEbmLwJGWIpsH2DL&pageNum=1&pageSize=100&srchTraStDt="+now3+"&srchTraEndDt="+after3+"&outType=1&sort=ASC&sortCol=TR_STT_DT&srchKeco1="+cod_val
     res = urlopen(spec).read().decode('euc-kr')
     xmlDoc = ET.fromstring(res)
     
@@ -120,7 +173,7 @@ def stackChart():
     nowPage = 1 #url에 넣을 페이지값
     while nowPage<=page_val:
         # 각 유형별 페이지만큼 반복문으로 교육기관 주소를 가져오는 목적 
-        spec2 = "http://hrd.go.kr/jsp/HRDP/HRDPO00/HRDPOA60/HRDPOA60_1.jsp?returnType=XML&authKey=Aflc7YIke55KR8qliEbmLwJGWIpsH2DL&pageNum="+str(nowPage)+"&pageSize=100&srchTraStDt=20200402&srchTraEndDt=20200702&outType=1&sort=ASC&sortCol=TR_STT_DT&srchKeco1="+cod_val
+        spec2 = "http://hrd.go.kr/jsp/HRDP/HRDPO00/HRDPOA60/HRDPOA60_1.jsp?returnType=XML&authKey=Aflc7YIke55KR8qliEbmLwJGWIpsH2DL&pageNum="+str(nowPage)+"&pageSize=100&srchTraStDt="+now3+"&srchTraEndDt="+after3+"&outType=1&sort=ASC&sortCol=TR_STT_DT&srchKeco1="+cod_val
         res2 = urlopen(spec2).read().decode('euc-kr')
         xmlDoc2 = ET.fromstring(res2)
         
@@ -143,6 +196,7 @@ def stackChart():
     df_res['location'] = df_loc
     
     del df_res['address']
+    
     
     json = df_res.to_json(orient='records')
 
