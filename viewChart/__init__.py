@@ -29,11 +29,13 @@ def mapChart():
     11' : 서울, '26' : 부산, '27' : 대구, '28' : 인천 '29' : 광주, '30' : 대전, '31' : 울산, '36' : 세종, 
     41' : 경기, '42' : 강원, '43' : 충북, '44' : 충남, '45' : 전북, '46' : 전남, '47' : 경북, '48' : 경남, '50' : 제주
     '''
+    
+    # 날짜 구하기
     now = datetime.datetime.now()
-    a = now + datetime.timedelta(days=365)
+    after = now + datetime.timedelta(days=365)
 
     now1 = str(now)[0:10]
-    after1 = str(a)[0:10]
+    after1 = str(after)[0:10]
     now2 = now1.split('-')
     after2 = after1.split('-')
     
@@ -55,13 +57,13 @@ def mapChart():
     
     for url in loc:
         # 지역별 url 생성
-        spec = "http://hrd.go.kr/jsp/HRDP/HRDPO00/HRDPOA60/HRDPOA60_1.jsp?returnType=XML&authKey=Aflc7YIke55KR8qliEbmLwJGWIpsH2DL&pageNum=1&pageSize=100&srchTraStDt="+now3+"&srchTraEndDt="+after3+"&outType=1&sort=ASC&sortCol=TR_STT_DT&srchTraArea1="+url
+        spec = "http://www.hrd.go.kr/jsp/HRDP/HRDPO00/HRDPOA60/HRDPOA60_1.jsp?returnType=XML&authKey=Aflc7YIke55KR8qliEbmLwJGWIpsH2DL&pageNum=1&pageSize=100&srchTraStDt="+now3+"&srchTraEndDt="+after3+"&outType=1&sort=ASC&sortCol=TR_STT_DT&srchTraArea1="+url
         
         # row에 담을 지역 값
         city = '' 
         name = ''
         if(url == '11'):
-            city = "KR-11" # 차트 지역코드
+            city = "KR-11" # 차트에 들어갈 지역코드
             name = "서울"
         if(url == '26'):
             city = "KR-26"
@@ -124,6 +126,7 @@ def mapChart():
     
     json = df.to_json(orient='records') # 결과 값을 json으로 변환
     
+    
     return json
 
 
@@ -134,11 +137,12 @@ def mapChart():
 #@app.route("/stackChart") #get방식
 def stackChart():
     
+    # 날짜 구하기
     now = datetime.datetime.now()
-    a = now + datetime.timedelta(days=365)
+    after = now + datetime.timedelta(days=365)
     
     now1 = str(now)[0:10]
-    after1 = str(a)[0:10]
+    after1 = str(after)[0:10]
     now2 = now1.split('-')
     after2 = after1.split('-')
     
@@ -162,7 +166,7 @@ def stackChart():
     
     cod_val = name #spec에 넣을 코드값
     
-    spec = "http://hrd.go.kr/jsp/HRDP/HRDPO00/HRDPOA60/HRDPOA60_1.jsp?returnType=XML&authKey=Aflc7YIke55KR8qliEbmLwJGWIpsH2DL&pageNum=1&pageSize=100&srchTraStDt="+now3+"&srchTraEndDt="+after3+"&outType=1&sort=ASC&sortCol=TR_STT_DT&srchKeco1="+cod_val
+    spec = "http://www.hrd.go.kr/jsp/HRDP/HRDPO00/HRDPOA60/HRDPOA60_1.jsp?returnType=XML&authKey=Aflc7YIke55KR8qliEbmLwJGWIpsH2DL&pageNum=1&pageSize=100&srchTraStDt="+now3+"&srchTraEndDt="+after3+"&outType=1&sort=ASC&sortCol=TR_STT_DT&srchKeco1="+cod_val
     res = urlopen(spec).read().decode('euc-kr')
     xmlDoc = ET.fromstring(res)
     
@@ -173,7 +177,7 @@ def stackChart():
     nowPage = 1 #url에 넣을 페이지값
     while nowPage<=page_val:
         # 각 유형별 페이지만큼 반복문으로 교육기관 주소를 가져오는 목적 
-        spec2 = "http://hrd.go.kr/jsp/HRDP/HRDPO00/HRDPOA60/HRDPOA60_1.jsp?returnType=XML&authKey=Aflc7YIke55KR8qliEbmLwJGWIpsH2DL&pageNum="+str(nowPage)+"&pageSize=100&srchTraStDt="+now3+"&srchTraEndDt="+after3+"&outType=1&sort=ASC&sortCol=TR_STT_DT&srchKeco1="+cod_val
+        spec2 = "http://www.hrd.go.kr/jsp/HRDP/HRDPO00/HRDPOA60/HRDPOA60_1.jsp?returnType=XML&authKey=Aflc7YIke55KR8qliEbmLwJGWIpsH2DL&pageNum="+str(nowPage)+"&pageSize=100&srchTraStDt="+now3+"&srchTraEndDt="+after3+"&outType=1&sort=ASC&sortCol=TR_STT_DT&srchKeco1="+cod_val
         res2 = urlopen(spec2).read().decode('euc-kr')
         xmlDoc2 = ET.fromstring(res2)
         
@@ -197,9 +201,8 @@ def stackChart():
     
     del df_res['address']
     
-    
     json = df_res.to_json(orient='records')
-
+    
     return json
 
 
